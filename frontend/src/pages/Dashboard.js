@@ -1,63 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
 function Dashboard() {
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const res = await axios.get('/api/questions');
-        setQuestions(res.data.questions || []);
-      } catch (err) {
-        setError('Failed to fetch questions');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const difficulties = ['Easy', 'Medium', 'Hard'];
+  const tags = ['Array', 'String', 'Tree', 'Graph', 'Dynamic Programming', 'Math'];
+  const times = ['5 min', '10 min', '15 min', '30 min'];
 
-    fetchQuestions();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span className="block sm:inline">{error}</span>
-      </div>
-    );
-  }
+  const handleTagSelect = (tag) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {questions.map((question) => (
-          <div key={question._id} className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-2">{question.title}</h2>
-            <p className="text-gray-600 mb-4">{question.description}</p>
-            <div className="flex justify-between items-center">
-              <span className={`px-2 py-1 rounded text-sm ${
-                question.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
-                question.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {question.difficulty}
-              </span>
-              <span className="text-sm text-gray-500">{question.topic}</span>
+    <div className="min-h-screen bg-gray-900 py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 flex gap-8">
+        {/* Game Modes */}
+        <div className="flex-1">
+          <div className="space-y-6">
+            <div className="bg-gray-800 rounded-3xl p-8 border border-gray-700 hover:border-gray-600 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+              <h2 className="text-2xl font-bold text-white mb-4">Single Player</h2>
+              <p className="text-gray-300 mb-4">Practice and improve your coding skills at your own pace</p>
+              <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                Start Solo Game
+              </button>
+            </div>
+
+            <div className="bg-gray-800 rounded-3xl p-8 border border-gray-700 hover:border-gray-600 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+              <h2 className="text-2xl font-bold text-white mb-4">Multiplayer</h2>
+              <p className="text-gray-300 mb-4">Compete with other players in real-time coding battles</p>
+              <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                Find Match
+              </button>
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Game Settings */}
+        <div className="flex-1">
+          <div className="bg-gray-800 rounded-3xl p-8 border border-gray-700">
+            <h2 className="text-3xl font-bold text-white mb-8">Game Settings</h2>
+            
+            {/* Time Selection */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-white mb-4">Choose Your Time</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {times.map((time) => (
+                  <button
+                    key={time}
+                    onClick={() => setSelectedTime(time)}
+                    className={`px-4 py-2 rounded-xl border ${
+                      selectedTime === time
+                        ? 'bg-indigo-600 border-indigo-500 text-white'
+                        : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                    } transition-all duration-200`}
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Difficulty Selection */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-white mb-4">Difficulty</h3>
+              <div className="grid grid-cols-3 gap-4">
+                {difficulties.map((difficulty) => (
+                  <button
+                    key={difficulty}
+                    onClick={() => setSelectedDifficulty(difficulty)}
+                    className={`px-4 py-2 rounded-xl border ${
+                      selectedDifficulty === difficulty
+                        ? 'bg-indigo-600 border-indigo-500 text-white'
+                        : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                    } transition-all duration-200`}
+                  >
+                    {difficulty}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tags Selection */}
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-4">Tags</h3>
+              <div className="flex flex-wrap gap-3">
+                {tags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagSelect(tag)}
+                    className={`px-4 py-2 rounded-full border ${
+                      selectedTags.includes(tag)
+                        ? 'bg-indigo-600 border-indigo-500 text-white'
+                        : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                    } transition-all duration-200`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
