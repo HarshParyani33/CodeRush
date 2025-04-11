@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from '../config/axios';
 
 const AuthContext = createContext();
@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const res = await axios.get('/api/auth/me');
       setUser(res.data);
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Error fetching user data:', error);
       logout();
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       delete axios.defaults.headers.common['Authorization'];
       setIsAuthenticated(false);
     }
-  }, [token]);
+  }, [token, fetchUserData]);
 
   const login = async (email, password) => {
     try {

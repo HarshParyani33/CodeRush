@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { SparklesCore } from '../components/ui/sparkles';
+import { BackgroundPaths } from '../components/ui/background-paths';
+import styles from '../styles/Register.module.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -23,82 +25,76 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-black flex items-center justify-center relative overflow-hidden">
-      {/* Sparkles Background */}
-      <div className="w-full absolute inset-0 h-screen">
-        <SparklesCore
-          id="tsparticlesfullpage"
-          background="transparent"
-          minSize={0.6}
-          maxSize={1.4}
-          particleDensity={100}
-          className="w-full h-full"
-          particleColor="#FFFFFF"
-          speed={1}
-        />
-      </div>
+    <div className="fixed inset-0 flex items-center justify-center overflow-hidden bg-[#030303]">
+      <BackgroundPaths />
+      
+      <div className={styles.cardContainer}>
+        <div className={styles.glassCard}>
+          <h2 className={styles.title}>Welcome Back</h2>
+          <p className={styles.subtitle}>Sign in to your account</p>
+          
+          {error && (
+            <div className={styles.errorAlert} role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+          
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="email" className={styles.inputLabel}>
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className={styles.inputField}
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            
+            <div className={styles.passwordWrapper}>
+              <label htmlFor="password" className={styles.inputLabel}>
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className={styles.inputField}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.showPasswordButton}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
 
-      {/* Glass Morph Card */}
-      <div className="relative z-10 w-full max-w-md p-8 bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl border border-white/20">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-          <p className="text-gray-300">Sign in to your account</p>
-        </div>
+            <button
+              type="submit"
+              className={styles.submitButton}
+            >
+              Sign in
+            </button>
 
-        {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-              Email address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200"
-          >
-            Sign in
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-gray-300">
-            Not registered yet?{' '}
-            <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">
-              Create an account
-            </Link>
-          </p>
+            <p className={styles.linkText}>
+              Don't have an account?{' '}
+              <Link to="/register" className={styles.link}>
+                Sign up
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </div>

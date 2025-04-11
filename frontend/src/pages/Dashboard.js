@@ -10,7 +10,7 @@ function Dashboard() {
     const fetchQuestions = async () => {
       try {
         const res = await axios.get('/api/questions');
-        setQuestions(res.data);
+        setQuestions(res.data.questions || []);
       } catch (err) {
         setError('Failed to fetch questions');
       } finally {

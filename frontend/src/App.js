@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -17,11 +17,14 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  const location = useLocation();
+  const isAuthPage = ['/login', '/register'].includes(location.pathname);
+
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-black">
+        {!isAuthPage && <Navbar />}
+        <main className={!isAuthPage ? "container mx-auto px-4 py-8" : ""}>
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/home" element={<Home />} />

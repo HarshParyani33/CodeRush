@@ -1,106 +1,113 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+"use client";
+
+import React, { useId, useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
+import { motion, useAnimation } from "framer-motion";
 
 export const SparklesCore = ({
   id,
+  className,
   background,
   minSize,
   maxSize,
-  particleDensity,
-  className,
-  particleColor,
   speed,
+  particleColor,
+  particleDensity,
 }) => {
+  const [init, setInit] = useState(false);
+  
   useEffect(() => {
-    const canvas = document.getElementById(id);
-    if (!canvas) return;
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine);
+    }).then(() => {
+      setInit(true);
+    });
+  }, []);
 
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  const controls = useAnimation();
 
-    let particles = [];
-    const PARTICLE_COUNT = particleDensity || 100;
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * (maxSize - minSize) + minSize;
-        this.speedX = (Math.random() - 0.5) * speed;
-        this.speedY = (Math.random() - 0.5) * speed;
-        this.opacity = Math.random();
-        this.growing = true;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.growing) {
-          this.opacity += 0.01;
-          if (this.opacity >= 1) this.growing = false;
-        } else {
-          this.opacity -= 0.01;
-          if (this.opacity <= 0) this.growing = true;
-        }
-
-        // Wrap around screen
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        if (this.y > canvas.height) this.y = 0;
-      }
-
-      draw() {
-        ctx.fillStyle = `rgba(${particleColor}, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    const init = () => {
-      particles = [];
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        particles.push(new Particle());
-      }
-    };
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
+  const particlesLoaded = async (container) => {
+    if (container) {
+      controls.start({
+        opacity: 1,
+        transition: {
+          duration: 1,
+        },
       });
-      requestAnimationFrame(animate);
-    };
+    }
+  };
 
-    init();
-    animate();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      init();
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [id, background, minSize, maxSize, particleDensity, particleColor, speed]);
+  const generatedId = useId();
 
   return (
-    <canvas
-      id={id}
-      className={className}
-      style={{
-        background: background || 'transparent',
-        position: 'absolute',
-        inset: 0,
-      }}
-    />
+    <motion.div 
+      animate={controls} 
+      className={`opacity-0 ${className || ''}`}
+      style={{ position: 'absolute', inset: 0 }}
+    >
+      {init && (
+        <Particles
+          id={id || generatedId}
+          className="h-full w-full"
+          particlesLoaded={particlesLoaded}
+          options={{
+            background: {
+              color: {
+                value: background || "#000000",
+              },
+            },
+            fullScreen: {
+              enable: false,
+              zIndex: 1,
+            },
+            fpsLimit: 120,
+            particles: {
+              color: {
+                value: particleColor || "#ffffff",
+              },
+              move: {
+                direction: "none",
+                enable: true,
+                outModes: {
+                  default: "bounce",
+                },
+                random: true,
+                speed: speed || 0.5,
+                straight: false,
+              },
+              number: {
+                density: {
+                  enable: true,
+                  area: 800,
+                },
+                value: particleDensity || 100,
+              },
+              opacity: {
+                value: {
+                  min: 0.1,
+                  max: 0.5,
+                },
+                animation: {
+                  enable: true,
+                  speed: 1,
+                  minimumValue: 0.1,
+                },
+              },
+              shape: {
+                type: "circle",
+              },
+              size: {
+                value: {
+                  min: minSize || 1,
+                  max: maxSize || 3,
+                },
+              },
+            },
+            detectRetina: true,
+          }}
+        />
+      )}
+    </motion.div>
   );
 }; 
